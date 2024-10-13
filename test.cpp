@@ -4,9 +4,6 @@
 #include <sstream>
 #include <cmath>
 #include <thread>
-#include <mutex>
-
-std::mutex mtx;  // Mutex para proteger o acesso ao vetor de chaves
 
 // Função que converte um número inteiro em uma string hexadecimal
 std::string intToHex(unsigned long long int num, int key_range) {
@@ -15,12 +12,10 @@ std::string intToHex(unsigned long long int num, int key_range) {
     return ss.str();
 }
 
-// Função que gera as chaves privadas em um intervalo e armazena no vetor compartilhado
+// Função que gera as chaves privadas em um intervalo e armazena no vetor na posição correta
 void generatePrivateKeysThread(int key_range, unsigned long long start, unsigned long long end, std::vector<std::string>& privateKeys) {
     for (unsigned long long i = start; i < end; i++) {
-        std::string key = intToHex(i, key_range);
-        std::lock_guard<std::mutex> lock(mtx);  // Protege o acesso ao vetor de chaves
-        privateKeys.push_back(key);
+        privateKeys[i] = intToHex(i, key_range);  // Preenche a posição correta no vetor
     }
 }
 
@@ -40,7 +35,7 @@ int main(int argc, char* argv[]) {
     int key_range = std::stoi(argv[1]);
 
     // Verifica se o key_range é válido
-    if (key_range < 1 || key_range > 160) {
+    if (key_range < 1 || key_range > 64) {
         std::cerr << "Erro: key_range deve estar entre 1 e 64" << std::endl;
         return 1;
     }
@@ -51,7 +46,7 @@ int main(int argc, char* argv[]) {
     int num_threads = std::thread::hardware_concurrency();  // Número de threads baseado no hardware
     if (num_threads == 0) num_threads = 1;  // Valor padrão caso não seja possível obter a contagem de threads
 
-    std::vector<std::string> privateKeys;  // Vetor compartilhado para armazenar todas as chaves
+    std::vector<std::string> privateKeys(totalKeys);  // Pré-aloca o vetor com o número total de chaves
     std::vector<std::thread> threads;  // Vetor para armazenar as threads
 
     unsigned long long keys_per_thread = totalKeys / num_threads;
