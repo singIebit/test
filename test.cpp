@@ -1,6 +1,7 @@
 #define CL_TARGET_OPENCL_VERSION 300
+#define CL_HPP_TARGET_OPENCL_VERSION 300
 #define CL_HPP_ENABLE_EXCEPTIONS
-#include <CL/cl2.hpp>
+//#include <CL/cl2.hpp>
 #include <CL/opencl.hpp>
 #include <iostream>
 #include <iomanip>
@@ -42,7 +43,21 @@ void genKeys(unsigned long long totalKeys, int key_range, int buffer_size) {
         platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
         cl::Device device = devices.front();
 
-        std::cout << "Utilizando dispositivo: " << device.getInfo<CL_DEVICE_NAME>() << "\n";
+        std::cout << "Device: " << device.getInfo<CL_DEVICE_NAME>() << "\n";
+
+        if (platforms.empty()) {
+            std::cout << "No OpenCL platforms found." << std::endl;
+        }
+
+        for (const auto& platform : platforms) {
+             std::string platformName;
+             platform.getInfo(CL_PLATFORM_NAME, &platformName);
+             std::cout << "Platform Name: " << platformName << std::endl;
+
+             std::string version;
+             platform.getInfo(CL_PLATFORM_VERSION, &version);
+             std::cout << "Platform Version: " << version << std::endl;
+        }
 
         cl::Context context(device);
         cl::CommandQueue queue(context, device);
@@ -100,6 +115,7 @@ void genKeys(unsigned long long totalKeys, int key_range, int buffer_size) {
 }
 
 int main(int argc, char* argv[]) {
+
     if (argc != 2) {
         std::cerr << "Use: " << argv[0] << " <key_range>" << std::endl;
         return 1;
@@ -115,7 +131,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Range " << key_range << ", starting...\n";
 
     unsigned long long totalKeys = 1ULL << key_range;
-    int buffer_size = 1024;
+    int buffer_size = 1032;
 
     genKeys(totalKeys, key_range, buffer_size);
 
