@@ -7,3 +7,4 @@ git clone https://github.com/singIebit/test.git
 cd test
 make
 ./main <key_range>
+```
