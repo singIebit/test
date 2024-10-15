@@ -1,17 +1,9 @@
-```markdown
-It's just a test :)
+# It's just a test :)
 
 Clone this repository:
-    ```bash
+```bash
     git clone https://github.com/singIebit/test.git
-    ```
-    ```bash
     cd test
-    ```
-    ```bash
     make
-    ```
-    ```bash
     ./main <key_range>
-    ```
 ```
